@@ -1,0 +1,287 @@
+/* error page */
+
+.eg-error__area {
+   background-color: var(--tg-black);
+  padding: 290px 0 180px;
+}
+.eg-error__title {
+  font-size: 320px;
+  line-height: .8;
+  color: #ffffff;
+  margin: 0 0 40px;
+}
+.eg-error__content p {
+  font-size: 46px;
+  line-height: 1.18;
+  margin: 0 0 35px;
+  color: #ffffff;
+}
+.eg-error__content .eg-btn{
+  background: #222222;
+}
+
+/*----------------------------------------*/
+/* Login css
+/*----------------------------------------*/
+.eg-login__wrapper {
+  box-shadow: 0px 30px 70px rgba(1, 15, 28, 0.1);
+  padding: 50px 60px 70px;
+  background-color: #1D1D3E;
+  border-radius: 15px;
+}
+.eg-login__title {
+  font-weight: 500;
+  font-size: 30px;
+  margin-bottom: 4px;
+}
+.eg-login__top p a {
+  display: inline-block;
+  position: relative;
+  color: #15B785;
+}
+.eg-login__option-item {
+  margin-bottom: 10px;
+}
+.eg-login__option-item a {
+  display: inline-block;
+  width: 98px;
+  height: 56px;
+  line-height: 54px;
+  text-align: center;
+  border: 1px solid #2B2B54;
+  font-size: 16px;
+  width: 100%;
+  border-radius: 10px;
+  color: var(--tg-body-font-color);
+}
+.eg-login__bottom .btn{
+  text-align: center;
+  display: inline-block;
+}
+.eg-login__bottom .btn:hover{
+  background: var(--tg-primary-color);
+}
+.eg-login__option-item a img {
+  margin-right: 7px;
+  -webkit-transform: translateY(-2px);
+  -moz-transform: translateY(-2px);
+  -ms-transform: translateY(-2px);
+  -o-transform: translateY(-2px);
+  transform: translateY(-2px);
+}
+.eg-login__option-item a:hover {
+  color: var(--tg-primary-color);
+  border-color: var(--tg-primary-color);
+}
+.eg-login__mail {
+  position: relative;
+  z-index: 1;
+}
+.eg-login__mail::after {
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  width: 100%;
+  height: 1px;
+  border: 1px solid #2B2B54;
+  -webkit-transition: all 0.3s 0s ease-out;
+  -moz-transition: all 0.3s 0s ease-out;
+  -ms-transition: all 0.3s 0s ease-out;
+  -o-transition: all 0.3s 0s ease-out;
+  transition: all 0.3s 0s ease-out;
+  z-index: -1;
+}
+.eg-login__mail p {
+  font-size: 15px;
+  color: var(--tg-body-font-color);
+  margin-bottom: 0;
+  padding: 0 20px;
+  position: relative;
+  display: inline-block;
+  background-color: var(--tg-secondary-color);
+}
+.eg-login__input-wrapper {
+  margin-bottom: 14px;
+}
+.eg-login__input-box:not(:last-child) {
+  margin-bottom: 34px;
+}
+.eg-password-show {
+  position: relative;
+}
+.eg-login__input input {
+  width: 100%;
+   border: none;
+  font-size: 15px;
+  font-weight: 400;
+  display: block;
+  padding: 14px 20px;
+  color: var(--tg-white);
+  border-radius: 5px;
+  height: 60px;
+  transition: .3s linear;
+  background-color: #0B0B29;
+}
+.eg-login__input input:focus{
+  border-color: var(--tg-primary-color);
+}
+.eg-login__input input#eg_password {
+  padding-right: 60px;
+}
+.eg-login__input label {
+  margin-bottom: 10px;
+}
+.eg-login__input-eye {
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.eg-login__input-eye span {
+  -webkit-transition: all 0.3s 0s ease-out;
+  -moz-transition: all 0.3s 0s ease-out;
+  -ms-transition: all 0.3s 0s ease-out;
+  -o-transition: all 0.3s 0s ease-out;
+  transition: all 0.3s 0s ease-out;
+}
+.eg-login__input-eye:hover {
+  cursor: pointer;
+}
+.eg-login__input-eye span svg{
+   /* fill: var(--tg-white); */
+}
+.eg-login__option p {
+  text-align: center;
+  margin: 10px 0 0;
+  background: #2B2B54;
+}
+.eg-login__option p.forgot{
+  background: transparent;
+}
+.eg-login__option p.forgot a{
+  color: #15B785;
+}
+.eg-login__option p a {
+  display: inline-block;
+  color: var(--tg-primary-color);
+}
+.eg-login__remeber input {
+  display: none;
+}
+.eg-login__remeber input:checked ~ label::after {
+  background-color: var(--tg-primary-color);
+  border-color: var(--tg-primary-color);
+}
+.eg-login__remeber input:checked ~ label::before {
+  visibility: visible;
+  opacity: 1;
+}
+.eg-login__remeber label {
+  font-size: 15px;
+  color: var(--tg-body-font-color);
+  position: relative;
+  padding-left: 26px;
+  z-index: 1;
+}
+.eg-login__remeber label::after {
+  position: absolute;
+  content: "";
+  top: 4px;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  text-align: center;
+  border: 1px solid #2B2B54;
+  z-index: -1;
+  -webkit-transition: all 0.3s 0s ease-out;
+  -moz-transition: all 0.3s 0s ease-out;
+  -ms-transition: all 0.3s 0s ease-out;
+  -o-transition: all 0.3s 0s ease-out;
+  transition: all 0.3s 0s ease-out;
+}
+.eg-login__remeber label::before {
+  position: absolute;
+  content: url("/assets/img/icon/check.svg");
+  top: 4px;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  color: #ffffff;
+  -webkit-transition: all 0.3s 0s ease-out;
+  -moz-transition: all 0.3s 0s ease-out;
+  -ms-transition: all 0.3s 0s ease-out;
+  -o-transition: all 0.3s 0s ease-out;
+  transition: all 0.3s 0s ease-out;
+}
+.eg-login__remeber label a:hover {
+  color: var(--tg-primary-color);
+}
+.eg-login__remeber label:hover {
+  cursor: pointer;
+}
+.eg-login__forgot a {
+  font-weight: 400;
+  font-size: 15px;
+  color: #15B785;
+  display: inline-block;
+}
+
+.sticky-menu {
+  position: fixed;
+  left: 0;
+  margin: auto;
+  top: 0;
+  width: 100%;
+  z-index: 99;
+  background-color: #0B0E13;
+  animation: fadeInDown 1s ease-in-out 0s 1 normal none running;
+  box-shadow: 0 10px 15px rgba(25,25,25,.1);
+  border-radius: 0;
+}
+.sticky-menu .main-menu ul li a {
+  padding: 35px 18px;
+}
+.accordion-button:focus{
+  box-shadow: none;
+  border: none;
+}
+.btc-header .sticky-menu {
+  background-color: #111828;
+}
+.ico-header .sticky-menu {
+  background-color: #151534;
+}
+
+.hero__countdown .countdown .single:not(:first-child) {
+	margin-right: 10px;
+}
+.hero__countdown .countdown .single {
+	min-width: 100px;
+	height: 100px;
+	background-color: #1F1F48;
+	border-radius: 50%;
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	-ms-border-radius: 50%;
+	-o-border-radius: 50%;
+	color: var(--color-white);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	margin-top: 10px;
+}
+p.form_error{
+  color: red;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 10px;
+  background: transparent;
+}
