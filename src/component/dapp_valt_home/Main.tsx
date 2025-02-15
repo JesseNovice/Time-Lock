@@ -7,6 +7,7 @@ import { whiteListABI, whiteListAddress, createVaultABI, createVaultWithSafetyAB
 import { db } from "@/lib/firebase"; // Firestore reference
 import { Analytics } from "firebase/analytics";
 import Link from "next/link";
+import { useCallback } from "react";
 
 const contractABI = whiteListABI.abi;
 const contractAddress = whiteListAddress;
@@ -23,15 +24,16 @@ const HasPaidWhiteLabelSection = ({ vaults, getEthBalance }: { vaults: any[], ge
     const [balance, setBalance] = useState<string | null>(null);
     const [showText, setShowText] = useState(true);
 
-    useEffect(() => {
-        if (selectedVault) {
-            const fetchBalance = async () => {
-                const fetchedBalance = await getEthBalance(selectedVault);
-                setBalance(fetchedBalance);
-            };
-            fetchBalance();
-        }
-    }, [selectedVault]); // ✅ Run effect when `selectedVault` changes
+useEffect(() => {
+    if (selectedVault) {
+        const fetchBalance = async () => {
+            const fetchedBalance = await getEthBalance(selectedVault);
+            setBalance(fetchedBalance);
+        };
+        fetchBalance();
+    }
+}, [selectedVault, getEthBalance]); 
+
 
 const handleDeposit = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
@@ -498,7 +500,7 @@ const Main = () => {
     const [displayMessage, setDisplayMessage] = useState<string>("Login To View your vaults below");
     const [hasPaidWhiteLabel, setHasPaidWhiteLabel] = useState<boolean | null>(null);
 
-const getEthBalance = async (selectedVault: { vaultTypeName: string; vaultAddress: string }) => {
+const getEthBalance = useCallback(async (selectedVault: { vaultTypeName: string; vaultAddress: string }) => {
     try {
         if (!window.ethereum) {
             console.error("Ethereum provider not found");
@@ -526,10 +528,10 @@ const getEthBalance = async (selectedVault: { vaultTypeName: string; vaultAddres
         console.error("Error fetching ETH balance:", error);
         return "N/A";
     }
-};
+}, []);
 
 
-const fetchVaults = async (userAddress: string) => {
+const fetchVaults = useCallback(async (userAddress: string) => {
     try {
         const vaultsRef = collection(db, "user_wallet", userAddress, "vaults");
         const querySnapshot = await getDocs(vaultsRef);
@@ -544,15 +546,14 @@ const fetchVaults = async (userAddress: string) => {
             const vaultData = doc.data();
             return {
                 id: doc.id,
-                vaultAddress: vaultData.vaultAddress || "", // Ensure vaultAddress exists
-                vaultTypeName: vaultData.vaultTypeName || "Unknown", // Ensure vaultTypeName exists
-                unlockTime: vaultData.unlockTime || 0, // Ensure unlockTime exists
+                vaultAddress: vaultData.vaultAddress || "", 
+                vaultTypeName: vaultData.vaultTypeName || "Unknown", 
+                unlockTime: vaultData.unlockTime || 0, 
             };
         });
 
         console.log("Retrieved Vaults:", userVaults);
 
-        // ✅ Fetch balances only if vault has valid address & type
         const balances = await Promise.all(
             userVaults.map(async (vault) => {
                 if (vault.vaultAddress && vault.vaultTypeName) {
@@ -569,71 +570,73 @@ const fetchVaults = async (userAddress: string) => {
     } catch (error) {
         console.error("Error fetching vaults:", error);
     }
-};
+}, [getEthBalance]);
 
 
 
-    const checkVaultStatus = async (provider: ethers.BrowserProvider) => {
-        try {
-            const signer = await provider.getSigner();
-            const address = await signer.getAddress();
-            setAccount(address); // Store connected account
+const checkVaultStatus = useCallback(async (provider: ethers.BrowserProvider) => {
+    try {
+        const signer = await provider.getSigner();
+        const address = await signer.getAddress();
+        setAccount(address); // Store connected account
 
-            const contract = new ethers.Contract(contractAddress, contractABI, signer);
-            const result = await contract.searchWhiteList(address);
-            setHasPaidWhiteLabel(!!result);
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const result = await contract.searchWhiteList(address);
+        setHasPaidWhiteLabel(!!result);
 
-            setDisplayMessage(!!result ? "View your vaults below" : "Pay A One Off Fee Of 0.0014 ETH To Create Your First Vault");
+        setDisplayMessage(!!result ? "View your vaults below" : "Pay A One Off Fee Of 0.0014 ETH To Create Your First Vault");
 
-            if (result) {
-                await fetchVaults(address); // Fetch vaults if the user is whitelisted
-            }
-        } catch (error) {
-            console.error("Error checking vault status:", error);
+        if (result) {
+            await fetchVaults(address); // Fetch vaults if the user is whitelisted
         }
-    };
+    } catch (error) {
+        console.error("Error checking vault status:", error);
+    }
+}, [fetchVaults]);
 
-    const autoConnectToMetaMask = async () => {
-        try {
-            if (window.ethereum) {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await provider.send("eth_accounts", []);
-                if (accounts.length > 0) {
-                    setAccount(accounts[0]);
-                    await checkVaultStatus(provider);
-                } else {
-                    setDisplayMessage("Login To View your vaults below");
-                }
+const autoConnectToMetaMask = useCallback(async () => {
+    try {
+        if (window.ethereum) {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const accounts = await provider.send("eth_accounts", []);
+            if (accounts.length > 0) {
+                setAccount(accounts[0]);
+                await checkVaultStatus(provider);
+            } else {
+                setDisplayMessage("Login To View your vaults below");
             }
-        } catch (error) {
-            console.error("Error automatically connecting to MetaMask:", error);
+        }
+    } catch (error) {
+        console.error("Error automatically connecting to MetaMask:", error);
+        setDisplayMessage("Login To View your vaults below");
+    }
+}, [checkVaultStatus]); 
+
+useEffect(() => {
+    const handleAccountsChanged = async (accounts: string[]) => {
+        if (accounts.length > 0 && window.ethereum) {
+            setAccount(accounts[0]);
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            await checkVaultStatus(provider);
+        } else {
+            setAccount(null);
+            setHasPaidWhiteLabel(null);
+            setVaults([]); // Clear vaults if the user disconnects
             setDisplayMessage("Login To View your vaults below");
         }
     };
 
-    useEffect(() => {
-        const handleAccountsChanged = async (accounts: string[]) => {
-            if (accounts.length > 0) {
-                setAccount(accounts[0]);
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                await checkVaultStatus(provider);
-            } else {
-                setAccount(null);
-                setHasPaidWhiteLabel(null);
-                setVaults([]); // Clear vaults if the user disconnects
-                setDisplayMessage("Login To View your vaults below");
-            }
+    if (typeof window !== "undefined" && window.ethereum) {
+        window.ethereum.on?.("accountsChanged", handleAccountsChanged);
+        autoConnectToMetaMask();
+
+        return () => {
+            window.ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
         };
+    }
+}, [autoConnectToMetaMask, checkVaultStatus]); 
 
-        if (window.ethereum) {
-            window.ethereum.on("accountsChanged", handleAccountsChanged);
-            autoConnectToMetaMask();
 
-            return () => {
-                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-            };
-        }
-    }, []);
 
     const addToWhiteList = async () => {
         try {
@@ -641,7 +644,7 @@ const fetchVaults = async (userAddress: string) => {
                 alert("Please connect your wallet first.");
                 return;
             }
-
+            if (window.ethereum) {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -657,6 +660,7 @@ const fetchVaults = async (userAddress: string) => {
 
             // Fetch vaults after user is added to whitelist
             await fetchVaults(account);
+        }
         } catch (error) {
             console.error("Error creating vault:", error);
         }

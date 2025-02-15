@@ -79,8 +79,11 @@ const Header = () => {
         }
     };
 
-    useEffect(() => {
-        if (window.ethereum) {
+useEffect(() => {
+    if (typeof window !== "undefined") {
+        const ethereum = window.ethereum; // Store ethereum reference
+
+        if (ethereum) {
             const handleAccountsChanged = (accounts: string[]) => {
                 if (accounts.length > 0) {
                     setAccount(accounts[0]);
@@ -93,14 +96,16 @@ const Header = () => {
                 }
             };
 
-            window.ethereum.on("accountsChanged", handleAccountsChanged);
+            ethereum.on?.("accountsChanged", handleAccountsChanged);
 
             // Clean up the event listener on unmount
             return () => {
-                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+                ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
             };
         }
-    }, []);
+    }
+}, []);
+
 
     return (
         <>
