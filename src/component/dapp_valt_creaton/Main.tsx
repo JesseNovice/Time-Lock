@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { vaultdeployerABI, vaultdeployerAddress, whiteListABI, whiteListAddress } from "../../../web3/constants";
 import { db } from "@/lib/firebase"; // Import Firestore instance
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
-
+import Link from "next/link";
 import { useRouter } from "next/navigation"; // Import Next.js router
 
 
@@ -126,21 +126,73 @@ const Main = () => {
         }
     }, [provider]);
 
-    const autoConnectToMetaMask = useCallback(async () => {
-        if (!provider) return;
-        try {
-            const accounts = await provider.send("eth_accounts", []);
-            if (accounts.length > 0) {
-                setAccount(accounts[0]);
-                await checkVaultStatus();
-            } else {
-                setDisplayMessage("Login To View your vaults below");
-            }
-        } catch (error) {
-            console.error("Error automatically connecting to MetaMask:", error);
+const autoConnectToMetaMask = useCallback(async () => {
+    try {
+        console.log("🔄 Attempting to auto-connect MetaMask...");
+        if (!window.ethereum) {
+            console.error("❌ MetaMask not found. Please install MetaMask.");
+            setDisplayMessage("MetaMask not detected. Please install it.");
+            return;
+        }
+
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_accounts", []);
+
+        if (accounts.length > 0) {
+            console.log("✅ Connected account:", accounts[0]);
+            setAccount(accounts[0]);
+            await checkVaultStatus();
+        } else {
+            console.log("❌ No accounts connected.");
             setDisplayMessage("Login To View your vaults below");
         }
-    }, [provider, checkVaultStatus]);
+    } catch (error) {
+        console.error("⚠️ Error auto-connecting to MetaMask:", error);
+        setDisplayMessage("Login To View your vaults below");
+    }
+}, [checkVaultStatus]);
+
+    const connectToMetaMask = async () => {
+        try {
+            // If already connected, disconnect
+            if (account) {
+                setAccount(null);
+                localStorage.removeItem("connectedAccount");
+                console.log("Disconnected from MetaMask");
+                return;
+            }
+
+            // Check if MetaMask is installed
+            if (window.ethereum == null) {
+                alert("MetaMask is not installed. Please install it to connect.");
+                return;
+            }
+
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const accounts = await provider.send("eth_requestAccounts", []);
+            if (accounts.length === 0) {
+                alert("No account connected. Please connect your account in MetaMask.");
+                return;
+            }
+
+            const userAddress = accounts[0];
+            setAccount(userAddress);
+            localStorage.setItem("connectedAccount", userAddress);
+            console.log("Connected account:", userAddress);
+
+            // Switch to the Sepolia network
+            const network = await provider.getNetwork();
+            if (network.chainId !== BigInt(11155111)) {
+                await window.ethereum.request({
+                    method: "wallet_switchEthereumChain",
+                    params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID
+                });
+            }
+        } catch (error) {
+            console.error("Error connecting to MetaMask:", error);
+        }
+    };
+
 
 
 const createVault = useCallback(async (_vaultduration: number, _vaulttype: number) => {
@@ -275,7 +327,11 @@ useEffect(() => {
                             ) : hasPaidWhiteLabel === false ? (
                                 <NotPaidWhiteLabelSection addToWhiteList={addToWhiteList} />
                             ) : (
-                                <p>Checking vault status...</p>
+                                <Link className="blc-btn blc-btn--white" href="#"onClick={(e) => {
+                                e.preventDefault();
+                                connectToMetaMask();
+                                }}
+                            >Login</Link>
                             )}
                         </div>
                     </div>

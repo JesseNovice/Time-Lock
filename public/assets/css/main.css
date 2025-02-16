@@ -7206,3 +7206,45 @@ blockquote {
     
 
 /*# sourceMappingURL=main.css.map */
+
+
+
+/* General button styles */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+  background: linear-gradient(black, black) padding-box, linear-gradient(90deg, #3273DC, #3BB28E) border-box;
+}
+
+/* Make primary buttons match */
+.btn-primary {
+  width: 100%;
+  /* Full width */
+  max-width: 250px;
+  /* Adjust to match other buttons */
+  height: 50px;
+  /* Set a fixed height */
+  margin: 10px auto;
+  /* Center button */
+  font-size: 16px;
+  /* Make text size match */
+  border-radius: 8px;
+  /* Ensure matching border radius */
+}
+
+/* Hover Effect */
+.btn-primary:hover {
+  background: linear-gradient(black, black) padding-box, linear-gradient(90deg, #3BB28E, #3273DC) border-box;
+}
