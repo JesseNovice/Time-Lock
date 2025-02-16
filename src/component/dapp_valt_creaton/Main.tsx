@@ -7,6 +7,9 @@ import { db } from "@/lib/firebase"; // Import Firestore instance
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // Import Next.js router
+import "@/assets/css/main.css"; // ✅ Import your global styles
+
+
 
 
 // Contract ABIs and addresses

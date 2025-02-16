@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase"; // Firestore reference
 import { Analytics } from "firebase/analytics";
 import Link from "next/link";
 import { useCallback } from "react";
+import "@/assets/css/main.css"; // ✅ Import your global styles
 
 const contractABI = whiteListABI.abi;
 const contractAddress = whiteListAddress;
@@ -432,16 +433,9 @@ const handleEmergencyWithdraw = async () => {
                 </div>
             ) : (
                 vaults.length > 0 ? (
-                    <div>
+                    <div className="table-responsive">
                     <table
                         className="table custom-table" 
-                        style={{
-                            width: "100%",
-                            borderCollapse: "collapse",
-                            border: "1px solid #444", 
-                            color: "#ffffff", 
-                            backgroundColor: "#111"
-                        }}
                     >
                         <thead>
                             <tr style={{ 
@@ -464,7 +458,7 @@ const handleEmergencyWithdraw = async () => {
                                     }}
                                 >
                                     <td style={{ padding: "12px", border: "1px solid #444", textDecoration: "underline", color: "#3BB28E" }}>
-                                        {vault.vaultAddress}
+                                        {vault.vaultAddress.substring(0, 6)}...{vault.vaultAddress.slice(-4)}
                                     </td>
                                     <td style={{ padding: "12px", border: "1px solid #444" }}>{vault.unlockTime} days</td>
                                     <td style={{ padding: "12px", border: "1px solid #444" }}>

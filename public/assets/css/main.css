@@ -7209,42 +7209,90 @@ blockquote {
 
 
 
-/* General button styles */
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 20px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #fff;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  border: 2px solid transparent;
-  background: linear-gradient(black, black) padding-box, linear-gradient(90deg, #3273DC, #3BB28E) border-box;
-}
-
-/* Make primary buttons match */
+/* Default Button Styles */
 .btn-primary {
-  width: 100%;
-  /* Full width */
-  max-width: 250px;
-  /* Adjust to match other buttons */
-  height: 50px;
-  /* Set a fixed height */
-  margin: 10px auto;
-  /* Center button */
-  font-size: 16px;
-  /* Make text size match */
-  border-radius: 8px;
-  /* Ensure matching border radius */
+  display: inline-block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  padding: 12px 20px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #3273DC, #3BB28E) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease-in-out !important;
 }
 
 /* Hover Effect */
 .btn-primary:hover {
-  background: linear-gradient(black, black) padding-box, linear-gradient(90deg, #3BB28E, #3273DC) border-box;
+  background: linear-gradient(90deg, #3BB28E, #3273DC) !important;
+  opacity: 0.9 !important;
+}
+
+/* Remove unwanted borders & shadows */
+.btn-primary:focus,
+.btn-primary:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ✅ Ensure the table container scrolls on small screens */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+}
+
+/* ✅ Ensure table stays in correct format */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  /* Forces scrolling on small screens */
+}
+
+/* ✅ Make table cells fit properly */
+.custom-table td,
+.custom-table th {
+  padding: 12px;
+  border: 1px solid #444;
+  white-space: nowrap;
+  /* Prevents text wrapping */
+}
+
+/* ✅ Mobile fix: Allow horizontal scrolling instead of stacking */
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto;
+    display: block;
+  }
+
+  .custom-table {
+    display: table;
+    width: 100%;
+  }
+
+  .custom-table thead {
+    display: table-header-group;
+  }
+
+  .custom-table tbody {
+    display: table-row-group;
+  }
+
+  .custom-table tr {
+    display: table-row;
+  }
+
+  .custom-table td,
+  .custom-table th {
+    display: table-cell;
+    padding: 10px;
+  }
 }
