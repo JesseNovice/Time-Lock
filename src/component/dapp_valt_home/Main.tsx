@@ -368,7 +368,7 @@ const handleEmergencyWithdraw = async () => {
                                 onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#285bb5"}
                                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#3273DC"}
                             >
-                                Deposit To Contract
+                                Deposit
                             </button>
 
                             <button 
@@ -387,7 +387,7 @@ const handleEmergencyWithdraw = async () => {
                             onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#e6b800"}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#ffcc00"}
                         >
-                            Withdraw From Contract
+                            Withdraw
                         </button>
 
                         <button 
@@ -408,7 +408,7 @@ const handleEmergencyWithdraw = async () => {
                             onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#555"}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#666"}
                         >
-                            Back To Vaults
+                            Back
                         </button>
                         
                     </div>

@@ -9,9 +9,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation"; // Import Next.js router
 import "@/assets/css/main.css"; // ✅ Import your global styles
 
-
-
-
 // Contract ABIs and addresses
 const contractABI = whiteListABI.abi;
 const contractAddress = whiteListAddress;
