@@ -8,6 +8,7 @@ import Team from "./Team"
 import UserOption from "./UserOption"
 import Header from "@/layouts/headers/Header"
 
+
 const HomeOne = () => {
   return (
     <div className="home-blockchain">

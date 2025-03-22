@@ -1,6 +1,6 @@
 "use client";
 
-import { ethers } from "ethers";
+import { ethers, Eip1193Provider } from "ethers";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { vaultdeployerABI, vaultdeployerAddress, whiteListABI, whiteListAddress } from "../../../web3/constants";
 import { db } from "@/lib/firebase"; // Import Firestore instance
@@ -8,6 +8,11 @@ import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // Import Next.js router
 import "@/assets/css/main.css"; // ✅ Import your global styles
+import { logEvent, Analytics } from "firebase/analytics";
+import { getAnalyticsInstance } from "@/lib/firebase"; // Import the new getter function
+import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react"; // Import the correct hooks
+const { open } = useAppKit(); // Opens WalletConnect modal
+
 
 // Contract ABIs and addresses
 const contractABI = whiteListABI.abi;
@@ -102,12 +107,27 @@ const Main = () => {
     const [displayMessage, setDisplayMessage] = useState<string>("Login To View your vaults below");
     const [hasPaidWhiteLabel, setHasPaidWhiteLabel] = useState<boolean | null>(null);
     const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+    const [analytics, setAnalytics] = useState<Analytics | null>(null);
+     const { walletProvider } = useAppKitProvider<Eip1193Provider>('eip155')
+     const { open } = useAppKit(); // Opens WalletConnect modal
+    const { address, isConnected } = useAppKitAccount(); // Retrieves connected wallet
+
+  // ✅ Fetch analytics safely
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      const instance = await getAnalyticsInstance();
+      if (instance) setAnalytics(instance);
+    };
+
+    fetchAnalytics();
+  }, []);
   
 
     // **Lazy Initialize Provider**
     useEffect(() => {
-        if (window.ethereum) {
-            setProvider(new ethers.BrowserProvider(window.ethereum));
+        if (walletProvider) {
+          //  setProvider(new ethers.BrowserProvider(window.ethereum));
+            setProvider(new ethers.BrowserProvider(walletProvider));
         }
     }, []);
 
@@ -126,72 +146,44 @@ const Main = () => {
         }
     }, [provider]);
 
-const autoConnectToMetaMask = useCallback(async () => {
+
+const connectToWallet = async () => {
     try {
-        console.log("🔄 Attempting to auto-connect MetaMask...");
-        if (!window.ethereum) {
-            console.error("❌ MetaMask not found. Please install MetaMask.");
-            setDisplayMessage("MetaMask not detected. Please install it.");
+        if (isConnected && address) {
+            console.log("Already connected:", address);
             return;
         }
 
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_accounts", []);
+        // Open WalletConnect modal
+        console.log("Opening WalletConnect...");
+        open();
+        console.log("Opening WalletConnect...");
 
-        if (accounts.length > 0) {
-            console.log("✅ Connected account:", accounts[0]);
-            setAccount(accounts[0]);
-            await checkVaultStatus();
-        } else {
-            console.log("❌ No accounts connected.");
-            setDisplayMessage("Login To View your vaults below");
+        if (!walletProvider) {
+            console.error("❌ Wallet provider not initialized.");
+            return;
+        }
+
+        // Create ethers.js provider
+        const provider = new ethers.BrowserProvider(walletProvider);
+        const signer = await provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        setAccount(userAddress);
+        console.log("✅ Connected Wallet:", userAddress);
+
+        // Ensure the user is on the Sepolia network
+        const network = await provider.getNetwork();
+        if (network.chainId !== BigInt(11155111)) {
+            await walletProvider.request({
+                method: "wallet_switchEthereumChain",
+                params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID
+            });
         }
     } catch (error) {
-        console.error("⚠️ Error auto-connecting to MetaMask:", error);
-        setDisplayMessage("Login To View your vaults below");
+        console.error("⚠️ Error connecting to WalletConnect:", error);
     }
-}, [checkVaultStatus]);
-
-    const connectToMetaMask = async () => {
-        try {
-            // If already connected, disconnect
-            if (account) {
-                setAccount(null);
-                localStorage.removeItem("connectedAccount");
-                console.log("Disconnected from MetaMask");
-                return;
-            }
-
-            // Check if MetaMask is installed
-            if (window.ethereum == null) {
-                alert("MetaMask is not installed. Please install it to connect.");
-                return;
-            }
-
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const accounts = await provider.send("eth_requestAccounts", []);
-            if (accounts.length === 0) {
-                alert("No account connected. Please connect your account in MetaMask.");
-                return;
-            }
-
-            const userAddress = accounts[0];
-            setAccount(userAddress);
-            localStorage.setItem("connectedAccount", userAddress);
-            console.log("Connected account:", userAddress);
-
-            // Switch to the Sepolia network
-            const network = await provider.getNetwork();
-            if (network.chainId !== BigInt(11155111)) {
-                await window.ethereum.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID
-                });
-            }
-        } catch (error) {
-            console.error("Error connecting to MetaMask:", error);
-        }
-    };
+};
 
 
 
@@ -228,7 +220,7 @@ const createVault = useCallback(async (_vaultduration: number, _vaulttype: numbe
         }
 
         if (!vaultDeployedEvent) {
-            console.error("VaultDeployed event not found in transaction logs.");
+            console.error("Vault Deployed event not found in transaction logs.");
             setLoading(false);
             return;
         }
@@ -299,15 +291,17 @@ useEffect(() => {
         }
     };
 
+
+    // Need to fix this
+
     if (window.ethereum) {
         window.ethereum?.on?.("accountsChanged", handleAccountsChanged);
-        autoConnectToMetaMask();
 
         return () => {
             window.ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
         };
     }
-}, [autoConnectToMetaMask, checkVaultStatus]);
+}, [checkVaultStatus]);
 
 
     return (
@@ -329,7 +323,7 @@ useEffect(() => {
                             ) : (
                                 <Link className="blc-btn blc-btn--white" href="#"onClick={(e) => {
                                 e.preventDefault();
-                                connectToMetaMask();
+                                connectToWallet();
                                 }}
                             >Login</Link>
                             )}

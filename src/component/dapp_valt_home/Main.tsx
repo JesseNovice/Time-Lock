@@ -1,21 +1,23 @@
 "use client";
 
-import { BrowserProvider, ethers } from "ethers";
+import { BrowserProvider, ethers, Eip1193Provider } from "ethers";
 import { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore"; // Firestore retrieval
 import { whiteListABI, whiteListAddress, createVaultABI, createVaultWithSafetyABI, timeDecayCreateVaultABI} from "../../../web3/constants";
-import { db } from "@/lib/firebase"; // Firestore reference
-import { Analytics } from "firebase/analytics";
+import { db } from "@/lib/firebase"; // Firestore & analytics reference
 import Link from "next/link";
 import { useCallback } from "react";
 import "@/assets/css/main.css"; // ✅ Import your global styles
+import { logEvent, Analytics } from "firebase/analytics";
+import { getAnalyticsInstance } from "@/lib/firebase"; // Import the new getter function
+import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react"; // Import the correct hooks and types
+
 
 const contractABI = whiteListABI.abi;
 const contractAddress = whiteListAddress;
 const createvaultABI = createVaultABI.abi;
 const createvaultwithsafetyABI = createVaultWithSafetyABI.abi;
 const timedecaycreatevaultABI = timeDecayCreateVaultABI.abi;
-
 
 const HasPaidWhiteLabelSection = ({ vaults, getEthBalance }: { vaults: any[], getEthBalance: Function }) => {
     const [selectedVault, setSelectedVault] = useState<any | null>(null);
@@ -24,6 +26,7 @@ const HasPaidWhiteLabelSection = ({ vaults, getEthBalance }: { vaults: any[], ge
     const [tokenAddress, setTokenAddress] = useState<string>("");
     const [balance, setBalance] = useState<string | null>(null);
     const [showText, setShowText] = useState(true);
+    const [isAppKitReady, setIsAppKitReady] = useState(false);
 
 useEffect(() => {
     if (selectedVault) {
@@ -34,6 +37,20 @@ useEffect(() => {
         fetchBalance();
     }
 }, [selectedVault, getEthBalance]); 
+
+    let appKit;
+
+    try {
+        appKit = useAppKit(); // Catch error if called too soon
+    } catch (error) {
+        console.warn("AppKit not ready yet.");
+    }
+
+    useEffect(() => {
+        setIsAppKitReady(true);
+    }, []);
+
+    if (!isAppKitReady || !appKit) return null; // Prevents useAppKit error
 
 
 const handleDeposit = async () => {
@@ -52,10 +69,18 @@ const handleDeposit = async () => {
     console.log(selectedVault);
 
     
-        try {
-            if (window.ethereum) {
+    try {
+
+        const { walletProvider } = useAppKitProvider<Eip1193Provider>('eip155')
+        if (!walletProvider) {
+        console.error("❌ Wallet provider is not initialized.");
+        return;
+    }
+
+            if (walletProvider) {
                 console.log("Preparing to send tx");
-                const provider = new ethers.BrowserProvider(window.ethereum);
+                const provider = new BrowserProvider(walletProvider)
+               // const provider = new BrowserProvider(window.ethereum);
                 const signer = await provider.getSigner();
                 let contract;
                 if (selectedVault.vaultTypeName === "createVault") {
@@ -483,9 +508,12 @@ const handleEmergencyWithdraw = async () => {
 };
 
 const NotPaidWhiteLabelSection = ({ addToWhiteList }: { addToWhiteList: () => void }) => (
+
+
     <button className="btn btn-primary" onClick={addToWhiteList}>
         Pay One Time Fee Of 0.0014 ETH
     </button>
+    
 );
 
 const Main = () => {
@@ -493,15 +521,31 @@ const Main = () => {
     const [vaults, setVaults] = useState<any[]>([]); // Store vault data
     const [displayMessage, setDisplayMessage] = useState<string>("Login To View your vaults below");
     const [hasPaidWhiteLabel, setHasPaidWhiteLabel] = useState<boolean | null>(null);
+    const { address, isConnected } = useAppKitAccount(); // Hook to access account data and connection status
+
+    const [analytics, setAnalytics] = useState<Analytics | null>(null);
+
+  // ✅ Fetch analytics safely
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      const instance = await getAnalyticsInstance();
+      if (instance) setAnalytics(instance);
+    };
+
+    fetchAnalytics();
+  }, []);
 
 const getEthBalance = useCallback(async (selectedVault: { vaultTypeName: string; vaultAddress: string }) => {
     try {
-        if (!window.ethereum) {
-            console.error("Ethereum provider not found");
-            return "N/A";
-        }
+const { walletProvider } = useAppKitProvider<Eip1193Provider>("eip155");
 
-        const localProvider = new ethers.BrowserProvider(window.ethereum);
+if (!walletProvider) {
+    console.error("❌ Wallet provider not initialized.");
+    return "N/A";
+}
+
+
+        const localProvider = new BrowserProvider(walletProvider);
         const signer = await localProvider.getSigner();
 
         let contract;
@@ -588,72 +632,6 @@ const checkVaultStatus = useCallback(async (provider: ethers.BrowserProvider) =>
     }
 }, [fetchVaults]);
 
-const autoConnectToMetaMask = useCallback(async () => {
-    try {
-        console.log("🔄 Attempting to auto-connect MetaMask...");
-        if (!window.ethereum) {
-            console.error("❌ MetaMask not found. Please install MetaMask.");
-            setDisplayMessage("MetaMask not detected. Please install it.");
-            return;
-        }
-
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_accounts", []);
-
-        if (accounts.length > 0) {
-            console.log("✅ Connected account:", accounts[0]);
-            setAccount(accounts[0]);
-            await checkVaultStatus(provider);
-        } else {
-            console.log("❌ No accounts connected.");
-            setDisplayMessage("Login To View your vaults below");
-        }
-    } catch (error) {
-        console.error("⚠️ Error auto-connecting to MetaMask:", error);
-        setDisplayMessage("Login To View your vaults below");
-    }
-}, [checkVaultStatus]);
-
-    const connectToMetaMask = async () => {
-        try {
-            // If already connected, disconnect
-            if (account) {
-                setAccount(null);
-                localStorage.removeItem("connectedAccount");
-                console.log("Disconnected from MetaMask");
-                return;
-            }
-
-            // Check if MetaMask is installed
-            if (window.ethereum == null) {
-                alert("MetaMask is not installed. Please install it to connect.");
-                return;
-            }
-
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const accounts = await provider.send("eth_requestAccounts", []);
-            if (accounts.length === 0) {
-                alert("No account connected. Please connect your account in MetaMask.");
-                return;
-            }
-
-            const userAddress = accounts[0];
-            setAccount(userAddress);
-            localStorage.setItem("connectedAccount", userAddress);
-            console.log("Connected account:", userAddress);
-
-            // Switch to the Sepolia network
-            const network = await provider.getNetwork();
-            if (network.chainId !== BigInt(11155111)) {
-                await window.ethereum.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID
-                });
-            }
-        } catch (error) {
-            console.error("Error connecting to MetaMask:", error);
-        }
-    };
 
 
 useEffect(() => {
@@ -672,13 +650,13 @@ useEffect(() => {
 
     if (typeof window !== "undefined" && window.ethereum) {
         window.ethereum.on?.("accountsChanged", handleAccountsChanged);
-        autoConnectToMetaMask();
+        // autoConnectToMetaMask();
 
         return () => {
             window.ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
         };
     }
-}, [autoConnectToMetaMask, checkVaultStatus]); 
+}, [ checkVaultStatus]); 
 
 
 
@@ -710,6 +688,8 @@ useEffect(() => {
         }
     };
 
+    
+
     return (
         <section
             className="hero hero__blockchain pos-rel bg_img"
@@ -729,11 +709,25 @@ useEffect(() => {
                             ) : hasPaidWhiteLabel === false ? (
                                 <NotPaidWhiteLabelSection addToWhiteList={addToWhiteList} />
                             ) : (
-                                <Link className="blc-btn blc-btn--white" href="#"onClick={(e) => {
-                                e.preventDefault();
-                                connectToMetaMask();
-                                }}
-                            >Login</Link>
+                <Link className="blc-btn blc-btn--white" href="#" onClick={(e) => {
+    e.preventDefault(); // ✅ Ensures no unwanted navigation
+    console.log("🔄 Clicking Login button...");
+
+    try {
+        if (isConnected) {
+            console.log("✅ Wallet already connected:", address);
+        } else {
+            console.log("🔄 Opening WalletConnect modal...");
+            open(); // ✅ Opens WalletConnect
+        }
+    } catch (error) {
+        console.error("❌ Error opening WalletConnect:", error);
+    }
+}}>
+    {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : "Login"}
+                </Link>
+
+
                             )}
                         </div>
                     </div>

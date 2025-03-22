@@ -1,111 +1,43 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import NavMenu from "./Menu/NavMenu";
 import Sidebar from "./Menu/Sidebar";
 import UseSticky from "@/component/hooks/UseSticky";
-import { ethers } from "ethers";
 import logo_1 from "@/assets/img/logo/c24f83f8-814e-4d43-912e-4adc6154a01b.png";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react"; // Import the correct hooks
 
 const Header = () => {
     const { sticky } = UseSticky();
-    const [isActive, setIsActive] = useState<boolean>(false);
-    const [account, setAccount] = useState<string | null>(null);
+    const [isActive, setIsActive] = useState(false);
+    const { open, close } = useAppKit(); // Hook to control the modal
+    const { address, isConnected } = useAppKitAccount(); // Hook to access account data and connection status
+    const [isAppKitReady, setIsAppKitReady] = useState(false);
+    
+    let appKit;
 
-    const autoConnectToMetaMask = async () => {
-        try {
-            if (window.ethereum) {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await provider.send("eth_accounts", []);
-
-                // If MetaMask has accounts connected, set the account
-                if (accounts.length > 0) {
-                    setAccount(accounts[0]);
-                    localStorage.setItem("connectedAccount", accounts[0]);
-                } else {
-                    // If no accounts are connected, clear any previously stored account
-                    setAccount(null);
-                    localStorage.removeItem("connectedAccount");
-                }
-            }
-        } catch (error) {
-            console.error("Error automatically connecting to MetaMask:", error);
-        }
-    };
+    try {
+        appKit = useAppKit(); // Catch error if called too soon
+    } catch (error) {
+        console.warn("AppKit not ready yet.");
+    }
 
     useEffect(() => {
-        autoConnectToMetaMask();
+        setIsAppKitReady(true);
     }, []);
 
-    const connectToMetaMask = async () => {
-        try {
-            // If already connected, disconnect
-            if (account) {
-                setAccount(null);
-                localStorage.removeItem("connectedAccount");
-                console.log("Disconnected from MetaMask");
-                return;
-            }
+    if (!isAppKitReady || !appKit) return null; // Prevents useAppKit error
 
-            // Check if MetaMask is installed
-            if (window.ethereum == null) {
-                alert("MetaMask is not installed. Please install it to connect.");
-                return;
-            }
-
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const accounts = await provider.send("eth_requestAccounts", []);
-            if (accounts.length === 0) {
-                alert("No account connected. Please connect your account in MetaMask.");
-                return;
-            }
-
-            const userAddress = accounts[0];
-            setAccount(userAddress);
-            localStorage.setItem("connectedAccount", userAddress);
-            console.log("Connected account:", userAddress);
-
-            // Switch to the Sepolia network
-            const network = await provider.getNetwork();
-            if (network.chainId !== BigInt(11155111)) {
-                await window.ethereum.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID
-                });
-            }
-        } catch (error) {
-            console.error("Error connecting to MetaMask:", error);
+    const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (isConnected) {
+            // Logic to disconnect the wallet
+            // You may need to implement this based on Reown's AppKit capabilities
+        } else {
+            open(); // Open the wallet connection modal
         }
     };
-
-useEffect(() => {
-    if (typeof window !== "undefined") {
-        const ethereum = window.ethereum; // Store ethereum reference
-
-        if (ethereum) {
-            const handleAccountsChanged = (accounts: string[]) => {
-                if (accounts.length > 0) {
-                    setAccount(accounts[0]);
-                    localStorage.setItem("connectedAccount", accounts[0]);
-                    console.log("Account changed:", accounts[0]);
-                } else {
-                    setAccount(null);
-                    localStorage.removeItem("connectedAccount");
-                    console.log("Disconnected from MetaMask");
-                }
-            };
-
-            ethereum.on?.("accountsChanged", handleAccountsChanged);
-
-            // Clean up the event listener on unmount
-            return () => {
-                ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
-            };
-        }
-    }
-}, []);
-
 
     return (
         <>
@@ -145,15 +77,12 @@ useEffect(() => {
                                     <a
                                         className="blc-btn"
                                         href="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            connectToMetaMask();
-                                        }}
+                                        onClick={handleButtonClick}
                                     >
                                         <span>
                                             <i className="fas fa-user"></i>
-                                            {account
-                                                ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
+                                            {isConnected && address
+                                                ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
                                                 : "LOGIN"}
                                         </span>
                                     </a>

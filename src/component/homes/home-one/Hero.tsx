@@ -1,9 +1,30 @@
+"use client";
+
 import Image from "next/image"
 import Link from "next/link"
+import { logEvent, Analytics } from "firebase/analytics";
+import { getAnalyticsInstance } from "@/lib/firebase"; // Import the new getter function
+import { useEffect, useState } from "react";
+
 
 import icon_1 from "@/assets/img/icon/sc.svg"
 
 const Hero = () => {
+   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+
+
+     useEffect(() => {
+    getAnalyticsInstance().then((instance) => {
+      if (instance) setAnalytics(instance);
+    });
+  }, []);
+
+ const handleClick = () => {
+    if (analytics) {
+      logEvent(analytics, "goal_completion", { name: "lever_puzzle" });
+    }
+  };
+
    return (
       <section className="hero hero__blockchain pos-rel bg_img" style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)` }}>
          <div className="container">
@@ -14,7 +35,7 @@ const Hero = () => {
 
                      <p className="mb-50 text-20 leading-30">Store your crypto in a locked vault of up to 1,000 days<br /> No more paper hands or emotional sells.</p>
                      <div className="btns">
-                        <Link className="blc-btn" href="/vault">launch app</Link>
+                        <Link className="blc-btn" href="/vault" onClick={handleClick}>launch app</Link>
                         <Link className="blc-btn blc-btn--white" href="#features">view types of vaults</Link>
                      </div>
                   </div>
