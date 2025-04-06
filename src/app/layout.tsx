@@ -20,11 +20,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" sizes="any" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Titillium+Web:wght@400;600;700&display=swap" />
       </head>
-      <body 
-      suppressHydrationWarning={true}>{children}
-    <AppKitProvider>
-      {children}
-    </AppKitProvider>
+      <body suppressHydrationWarning={true}>
+        <AppKitProvider>
+          {children}
+        </AppKitProvider>
       </body>
     </html>
   );

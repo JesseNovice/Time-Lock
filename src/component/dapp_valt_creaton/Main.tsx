@@ -4,10 +4,10 @@ import { ethers, Eip1193Provider } from "ethers";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { vaultdeployerABI, vaultdeployerAddress, whiteListABI, whiteListAddress } from "../../../web3/constants";
 import { db } from "@/lib/firebase"; // Import Firestore instance
-import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
+import { doc, setDoc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // Import Next.js router
-import "@/assets/css/main.css"; // ✅ Import your global styles
+import "@/assets/css/main.css"; // Import your global styles
 import { logEvent, Analytics } from "firebase/analytics";
 import { getAnalyticsInstance } from "@/lib/firebase"; // Import the new getter function
 import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react"; // Import the correct hooks
@@ -86,7 +86,7 @@ const HasPaidWhiteLabelSection = ({ createVault, loading }: { createVault: (_vau
             <br />
 
 <button type="submit" className="btn btn-primary" disabled={loading}>
-    {loading ? <span>Deploying... 🔄</span> : "Deploy Your Vault"}
+    {loading ? <span>Deploying... </span> : "Deploy Your Vault"}
 </button>
         </form>
     );
@@ -103,166 +103,185 @@ const NotPaidWhiteLabelSection = ({ addToWhiteList }: { addToWhiteList: () => vo
 const Main = () => {
     const [loading, setLoading] = useState<boolean>(false); // Track loading state
     const router = useRouter(); // Next.js Router
-    const [account, setAccount] = useState<string | null>(null);
     const [displayMessage, setDisplayMessage] = useState<string>("Login To View your vaults below");
     const [hasPaidWhiteLabel, setHasPaidWhiteLabel] = useState<boolean | null>(null);
-    const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
-     const { walletProvider } = useAppKitProvider<Eip1193Provider>('eip155')
-     const { open } = useAppKit(); // Opens WalletConnect modal
+    const { walletProvider } = useAppKitProvider<Eip1193Provider>('eip155');
+    const { open } = useAppKit(); // Opens WalletConnect modal
     const { address, isConnected } = useAppKitAccount(); // Retrieves connected wallet
 
-  // ✅ Fetch analytics safely
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      const instance = await getAnalyticsInstance();
-      if (instance) setAnalytics(instance);
-    };
-
-    fetchAnalytics();
-  }, []);
-  
-
-    // **Lazy Initialize Provider**
-    useEffect(() => {
-        if (walletProvider) {
-          //  setProvider(new ethers.BrowserProvider(window.ethereum));
-            setProvider(new ethers.BrowserProvider(walletProvider));
-        }
-    }, []);
-
     const checkVaultStatus = useCallback(async () => {
-        if (!provider) return;
+        if (!walletProvider || !address) return;
         try {
+            const provider = new ethers.BrowserProvider(walletProvider);
             const signer = await provider.getSigner();
-            const address = await signer.getAddress();
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
             const result = await contract.searchWhiteList(address);
             setHasPaidWhiteLabel(!!result);
-
-            setDisplayMessage(!!result ? "Choose the duration or set a custom durationg alongside the vault type" : "Pay A One Off Fee Of 0.0014 ETH To Create Your First Vault");
+            setDisplayMessage(!!result ? "Choose the duration or set a custom duration alongside the vault type" : "Pay A One Off Fee Of 0.0014 ETH To Create Your First Vault");
         } catch (error) {
             console.error("Error checking vault status:", error);
         }
-    }, [provider]);
+    }, [walletProvider, address]);
 
+    // Effect to handle connection changes
+    useEffect(() => {
+        if (isConnected && address && walletProvider) {
+            checkVaultStatus();
+        } else {
+            setHasPaidWhiteLabel(null);
+            setDisplayMessage("Login To View your vaults below");
+        }
+    }, [address, isConnected, walletProvider, checkVaultStatus]);
 
-const connectToWallet = async () => {
-    try {
-        if (isConnected && address) {
-            console.log("Already connected:", address);
+    // Fetch analytics safely
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            const instance = await getAnalyticsInstance();
+            if (instance) setAnalytics(instance);
+        };
+        fetchAnalytics();
+    }, []);
+
+    const createVault = useCallback(async (_vaultduration: number, _vaulttype: number) => {
+        if (!isConnected || !address || !walletProvider) {
+            alert("Please connect your wallet first.");
             return;
         }
 
-        // Open WalletConnect modal
-        console.log("Opening WalletConnect...");
-        open();
-        console.log("Opening WalletConnect...");
+        setLoading(true); // Start loading spinner
 
-        if (!walletProvider) {
-            console.error("❌ Wallet provider not initialized.");
-            return;
-        }
+        try {
+            const provider = new ethers.BrowserProvider(walletProvider);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(vaultFactoryContractAddress, vaultFactoryContractABI, signer);
 
-        // Create ethers.js provider
-        const provider = new ethers.BrowserProvider(walletProvider);
-        const signer = await provider.getSigner();
-        const userAddress = await signer.getAddress();
+            console.log(`Creating vault with duration: ${_vaultduration} days, type: ${_vaulttype}, for address: ${address}`);
+            const tx = await contract.deployVault(_vaultduration, _vaulttype, address);
+            console.log("Transaction sent:", tx.hash);
 
-        setAccount(userAddress);
-        console.log("✅ Connected Wallet:", userAddress);
+            const receipt = await tx.wait();
+            console.log("Transaction confirmed:", receipt);
 
-        // Ensure the user is on the Sepolia network
-        const network = await provider.getNetwork();
-        if (network.chainId !== BigInt(11155111)) {
-            await walletProvider.request({
-                method: "wallet_switchEthereumChain",
-                params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID
-            });
-        }
-    } catch (error) {
-        console.error("⚠️ Error connecting to WalletConnect:", error);
-    }
-};
+            // Use Interface to decode logs
+            const iface = new ethers.Interface(vaultFactoryContractABI);
+            let vaultDeployedEvent: ethers.LogDescription | null = null;
 
-
-
-const createVault = useCallback(async (_vaultduration: number, _vaulttype: number) => {
-    if (!account || !provider) {
-        alert("Please connect your wallet first.");
-        return;
-    }
-
-    setLoading(true); // Start loading spinner
-
-    try {
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(vaultFactoryContractAddress, vaultFactoryContractABI, signer);
-
-        // Call contract function to deploy the vault
-        const tx = await contract.deployVault(_vaultduration, _vaulttype, account);
-        const receipt = await tx.wait(); // Wait for transaction confirmation
-
-        // ✅ Use Interface to decode logs in Ethers v6
-        const iface = new ethers.Interface(vaultFactoryContractABI);
-
-        let vaultDeployedEvent: ethers.LogDescription | null = null;
-        for (const log of receipt.logs) {
-            try {
-                const parsedLog = iface.parseLog(log);
-                if (parsedLog && parsedLog.name === "VaultDeployed") {
-                    vaultDeployedEvent = parsedLog;
-                    break;
+            for (const log of receipt.logs) {
+                try {
+                    const parsedLog = iface.parseLog({
+                        topics: log.topics,
+                        data: log.data
+                    });
+                    if (parsedLog && parsedLog.name === "VaultDeployed") {
+                        vaultDeployedEvent = parsedLog;
+                        break;
+                    }
+                } catch (err) {
+                    continue;
                 }
-            } catch (err) {
-                continue;
             }
-        }
 
-        if (!vaultDeployedEvent) {
-            console.error("Vault Deployed event not found in transaction logs.");
+            if (!vaultDeployedEvent) {
+                throw new Error("VaultDeployed event not found in transaction logs");
+            }
+
+            // Extract data from event
+            const [newVaultAddress, vaultTypeName, unlockTimeBigInt] = vaultDeployedEvent.args;
+            console.log("New vault deployed!", {
+                address: newVaultAddress,
+                type: vaultTypeName,
+                unlockTime: unlockTimeBigInt.toString()
+            });
+
+            // Save to Firestore with correct data structure
+            try {
+                // First check if the vault already exists
+                const vaultRef = doc(db, "vaults", newVaultAddress);
+                
+                // Log the database reference
+                console.log("Firebase config:", {
+                    projectId: (db as any)._databaseId?.projectId,
+                    databasePath: vaultRef.path
+                });
+
+                const vaultData = {
+                    vaultAddress: newVaultAddress,
+                    owner: address.toLowerCase(),
+                    vaultTypeName: _vaulttype === 1 ? "createVault" : 
+                                 _vaulttype === 2 ? "createVaultWithSafety" : 
+                                 "timeDecayCreateVault",
+                    unlockTime: _vaultduration,
+                    createdAt: new Date().toISOString(),
+                    network: (await provider.getNetwork()).chainId.toString(),
+                    lastUpdated: new Date().toISOString()
+                };
+
+                console.log("Attempting to save vault data:", JSON.stringify(vaultData, null, 2));
+                
+                // Try to write to Firestore
+                try {
+                    await setDoc(vaultRef, vaultData);
+                    console.log("✅ Vault data saved successfully to path:", vaultRef.path);
+                    
+                    // Verify the write
+                    const verifyDoc = await getDoc(vaultRef);
+                    if (verifyDoc.exists()) {
+                        console.log("✅ Verified vault data in Firestore:", verifyDoc.data());
+                    } else {
+                        console.error("❌ Vault document not found after write!");
+                        throw new Error("Vault write verification failed");
+                    }
+                } catch (writeError) {
+                    console.error("❌ Firestore write error:", writeError);
+                    if (writeError instanceof Error) {
+                        console.error("Write error details:", {
+                            name: writeError.name,
+                            message: writeError.message,
+                            stack: writeError.stack
+                        });
+                    }
+                    throw writeError;
+                }
+
+                if (analytics) {
+                    logEvent(analytics, 'vault_created', {
+                        vault_address: newVaultAddress,
+                        vault_type: _vaulttype,
+                        duration: _vaultduration,
+                        owner: address.toLowerCase()
+                    });
+                }
+
+                console.log("✅ All vault creation steps completed successfully");
+                alert("Vault created successfully!");
+                router.push('/vault');
+            } catch (error) {
+                console.error("❌ Error in vault creation process:", error);
+                if (error instanceof Error) {
+                    console.error("Error details:", {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack
+                    });
+                }
+                alert("Error saving vault data. Please check the console for details.");
+            }
+        } catch (error) {
+            console.error("Error creating vault:", error);
+            alert("Error creating vault. Please check the console for details.");
+        } finally {
             setLoading(false);
-            return;
         }
-
-        // 🔹 Convert `BigInt` to `number`
-        const args = vaultDeployedEvent.args as unknown as [string, string, BigInt];
-        const [newVaultAddress, vaultTypeName, unlockTimeBigInt] = args;
-        const unlockTime = Number(unlockTimeBigInt);
-
-        console.log("Vault deployed at:", newVaultAddress);
-        console.log("Vault Type Name:", vaultTypeName);
-        console.log("Unlock Time:", new Date(unlockTime * 1000).toLocaleString());
-
-    const vaultRef = doc(db, "user_wallet", await signer.getAddress(), "vaults", newVaultAddress);
-    await setDoc(vaultRef, {
-    signer: await signer.getAddress(),
-    vaultAddress: newVaultAddress,
-    vaultTypeName: vaultTypeName,
-    unlockTime: unlockTime.toString(),
-    createdAt: new Date().toISOString(),
-});
-
-
-
-        console.log("Vault data stored in Firestore.");
-
-        // ✅ Redirect to `/vault`
-        router.push("/vault");
-
-    } catch (error) {
-        console.error("Error creating vault:", error);
-    } finally {
-        setLoading(false); // Stop loading spinner
-    }
-}, [account, provider, router]);
+    }, [isConnected, address, walletProvider, analytics, router]);
 
     const addToWhiteList = useCallback(async () => {
-        if (!account || !provider) {
+        if (!isConnected || !address || !walletProvider) {
             alert("Please connect your wallet first.");
             return;
         }
         try {
+            const provider = new ethers.BrowserProvider(walletProvider);
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -276,33 +295,7 @@ const createVault = useCallback(async (_vaultduration: number, _vaulttype: numbe
         } catch (error) {
             console.error("Error adding to whitelist:", error);
         }
-    }, [account, provider]);
-
-useEffect(() => {
-    const handleAccountsChanged = async (accounts: string[]) => {
-        if (accounts.length > 0) {
-            setAccount(accounts[0]);
-            await checkVaultStatus();
-        } else {
-            setAccount(null);
-            setHasPaidWhiteLabel(null);
-            setDisplayMessage("Login To View your vaults below");
-            localStorage.removeItem("connectedAccount");
-        }
-    };
-
-
-    // Need to fix this
-
-    if (window.ethereum) {
-        window.ethereum?.on?.("accountsChanged", handleAccountsChanged);
-
-        return () => {
-            window.ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
-        };
-    }
-}, [checkVaultStatus]);
-
+    }, [isConnected, address, walletProvider]);
 
     return (
         <section className="hero hero__blockchain pos-rel bg_img" style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)` }}>
@@ -323,7 +316,7 @@ useEffect(() => {
                             ) : (
                                 <Link className="blc-btn blc-btn--white" href="#"onClick={(e) => {
                                 e.preventDefault();
-                                connectToWallet();
+                                open();
                                 }}
                             >Login</Link>
                             )}

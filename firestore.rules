@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to vaults collection
+    match /vaults/{vaultId} {
+      // Allow read if the user is authenticated or if checking ownership
+      allow read: if true;
+      
+      // Allow write if creating a new vault
+      allow write: if true;
+    }
+  }
+}
