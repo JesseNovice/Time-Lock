@@ -26,14 +26,14 @@ const Hero = () => {
   };
 
    return (
-      <section className="hero hero__blockchain pos-rel bg_img pb-20 pt-20 mb-20" style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)` }}>
+      <section className="hero hero__blockchain pos-rel bg_img pb-20 pt-20 mb-20" style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)`, minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
          <div className="container">
             <div className="row align-items-center">
-               <div className="col-lg-7">
+               <div className="col-lg-7 col-md-12">
                   <div className="blockchain-hero__content">
-                     <h1 className="title text-80 mb-35 -tracking-2/4">Create A Time Locked Vault To Store Your Crypto</h1>
+                     <h1 className="title text-80 mb-35 -tracking-2/4" style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', lineHeight: '1.2' }}>Create A Time Locked Vault To Store Your Crypto</h1>
 
-                     <p className="mb-50 text-20 leading-30">Store your crypto in a locked vault of up to 1,000 days<br /> No more paper hands or emotional sells.</p>
+                     <p className="mb-50 text-20 leading-30" style={{ fontSize: 'clamp(1.125rem, 2vw, 1.25rem)' }}>Store your crypto in a locked vault of up to 1,000 days<br /> No more paper hands or emotional sells.</p>
                      <div className="btns">
                         <Link className="blc-btn" href="/vault" onClick={handleClick}>launch app</Link>
                         <Link className="blc-btn blc-btn--white" href="#features">view types of vaults</Link>
