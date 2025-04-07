@@ -14,20 +14,12 @@ const Header = () => {
     const { open, close } = useAppKit(); // Hook to control the modal
     const { address, isConnected } = useAppKitAccount(); // Hook to access account data and connection status
     const [isAppKitReady, setIsAppKitReady] = useState(false);
-    
-    let appKit;
-
-    try {
-        appKit = useAppKit(); // Catch error if called too soon
-    } catch (error) {
-        console.warn("AppKit not ready yet.");
-    }
 
     useEffect(() => {
         setIsAppKitReady(true);
     }, []);
 
-    if (!isAppKitReady || !appKit) return null; // Prevents useAppKit error
+    if (!isAppKitReady) return null; // Wait for AppKit to be ready
 
     const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();

@@ -365,22 +365,6 @@ const HasPaidWhiteLabelSection = ({ vaults, getEthBalance, analytics }: { vaults
                                 Withdraw
                             </button>
 
-                            {selectedVault.vaultTypeName === "createVaultWithSafety" && (
-                                <button
-                                    onClick={handleEmergencyWithdraw}
-                                    style={{
-                                        padding: "10px 20px",
-                                        backgroundColor: "#ff9800",
-                                        color: "white",
-                                        border: "none",
-                                        borderRadius: "4px",
-                                        cursor: "pointer"
-                                    }}
-                                >
-                                    Emergency Withdraw
-                                </button>
-                            )}
-
                             <button
                                 onClick={handleClick}
                                 style={{
@@ -596,7 +580,7 @@ const fetchVaults = useCallback(async (userAddress: string) => {
         }
         setVaults([]);
     }
-}, [analytics, getEthBalance, walletProvider]);
+}, [analytics, getEthBalance]);
 
 
 
@@ -618,7 +602,7 @@ const checkVaultStatus = useCallback(async () => {
     } catch (error) {
         console.error("Error checking vault status:", error);
     }
-}, [walletProvider, address, fetchVaults]);
+}, [address, fetchVaults]);
 
 useEffect(() => {
     if (isConnected && address && walletProvider) {

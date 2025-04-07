@@ -11,8 +11,6 @@ import "@/assets/css/main.css"; // Import your global styles
 import { logEvent, Analytics } from "firebase/analytics";
 import { getAnalyticsInstance } from "@/lib/firebase"; // Import the new getter function
 import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react"; // Import the correct hooks
-const { open } = useAppKit(); // Opens WalletConnect modal
-
 
 // Contract ABIs and addresses
 const contractABI = whiteListABI.abi;
@@ -107,8 +105,8 @@ const Main = () => {
     const [hasPaidWhiteLabel, setHasPaidWhiteLabel] = useState<boolean | null>(null);
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
     const { walletProvider } = useAppKitProvider<Eip1193Provider>('eip155');
-    const { open } = useAppKit(); // Opens WalletConnect modal
     const { address, isConnected } = useAppKitAccount(); // Retrieves connected wallet
+    const { open } = useAppKit(); // Opens WalletConnect modal
 
     const checkVaultStatus = useCallback(async () => {
         if (!walletProvider || !address) return;
