@@ -10,7 +10,7 @@ const list_data: string[] = ["Locked For Up To 1,000 Days", "Accepts All ERC-20 
 
 const About = () => {
    return (
-      <section className="blc-about">
+      <section className="blc-about pb-20 pt-20 mb-20">
          <div className="container">
             <div className="row align-items-center">
                <div className="col-lg-6">

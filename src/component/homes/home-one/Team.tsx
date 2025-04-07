@@ -5,7 +5,7 @@ import team_data from "@/component/data/TeamData";
 
 const Team = () => {
    return (
-      <section id="team" className="team team__bg pb-120 pt-120" style={{backgroundImage:`url(/assets/img/bg/team_sec_bg.png)`}}>
+      <section id="team" className="team team__bg pb-20 pt-20 mb-20" style={{backgroundImage:`url(/assets/img/bg/team_sec_bg.png)`}}>
          <div className="container">
             <div className="sec-title style2 text-center mb-60">
                <h2 className="sec-title__title text-50 mb-25">Our Dedicated Team</h2>

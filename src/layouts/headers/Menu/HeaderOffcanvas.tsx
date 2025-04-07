@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import logo_1 from "@/assets/img/logo/logo.png";
+import logo_1 from "/public/New_Logo.png";
 
 const HeaderOffcanvas = ({ offCanvas, setOffCanvas }: any) => {
    return (
@@ -12,7 +12,7 @@ const HeaderOffcanvas = ({ offCanvas, setOffCanvas }: any) => {
                   <button onClick={() => setOffCanvas(false)}><i className="far fa-window-close"></i></button>
                </div>
                <div className="logo-side mb-30">
-                  <Link href="/"><Image src={logo_1} alt="Logo" /></Link>
+                  <Link href="/"><Image src={logo_1} alt="Logo" width={150} height={50} /></Link>
                </div>
                <div className="side-info mb-30">
                   <div className="contact-list mb-30">

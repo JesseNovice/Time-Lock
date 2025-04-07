@@ -15,9 +15,8 @@ const HomeOne = () => {
       <div className="body_wrap">
         <Header />
         <Hero />
-        <UserOption />
         <About />
-        <Advantages />
+        <UserOption />
         <Team />
         <Roadmap />
         <FaqArea />

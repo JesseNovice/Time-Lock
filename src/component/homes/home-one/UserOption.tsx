@@ -53,7 +53,7 @@ const UserOption = () => {
 
 
    return (
-      <section className="user-option pb-110" id="features">
+      <section className="user-option pb-20 pt-20 mb-20" id="features">
          <div className="container">
             <div className="sec-title style2 text-center mb-20">
                <h2 className="sec-title__title text-50 mb-25">Three Types of Vaults</h2>

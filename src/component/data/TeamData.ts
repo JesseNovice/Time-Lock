@@ -18,7 +18,7 @@ interface DataType {
 
 const team_data: DataType[] = [
       {
-      id: 2,
+      id: 1,
       page: "home_1",
       thumb: thumb_2,
       title: "Jesse Lees",
@@ -32,14 +32,14 @@ const team_data: DataType[] = [
       designation: "Community Manager",
    },
          {
-      id: 2,
+      id: 3,
       page: "home_1",
       thumb: thumb_3,
       title: "Hiring Soon",
       designation: "Blockchain Developer",
    },
          {
-      id: 2,
+      id: 4,
       page: "home_1",
       thumb: thumb_3,
       title: "Hiring Soon",
@@ -53,28 +53,28 @@ const team_data: DataType[] = [
    // home_3
 
    {
-      id: 1,
+      id: 5,
       page: "home_3",
       thumb: home_3thumb_1,
       title: "Michael Johnson",
       designation: "Developer",
    },
    {
-      id: 2,
+      id: 6,
       page: "home_3",
       thumb: home_3thumb_2,
       title: "Nathaniel Lewis",
       designation: "Founder & CO",
    },
    {
-      id: 3,
+      id: 7,
       page: "home_3",
       thumb: home_3thumb_3,
       title: "Timothy Young",
       designation: "Designer",
    },
    {
-      id: 4,
+      id: 8,
       page: "home_3",
       thumb: home_3thumb_4,
       title: "David Williams",

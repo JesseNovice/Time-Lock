@@ -5,7 +5,7 @@ import Image from "next/image";
 import NavMenu from "./Menu/NavMenu";
 import Sidebar from "./Menu/Sidebar";
 import UseSticky from "@/component/hooks/UseSticky";
-import logo_1 from "@/assets/img/logo/c24f83f8-814e-4d43-912e-4adc6154a01b.png";
+import logo_1 from "/public/New_Logo.png";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react"; // Import the correct hooks
 
 const Header = () => {
@@ -38,9 +38,9 @@ const Header = () => {
                     <div className="container-fluid">
                         <div className="header__main ul_li_between">
                             <div className="header__left ul_li">
-                                <div className="header__logo">
+                                <div className="header__logo" style={{ display: 'flex', alignItems: 'center', marginLeft: '-20px' }}>
                                     <Link href="/">
-                                        <Image src={logo_1} alt="Logo" />
+                                        <Image src={logo_1} alt="Logo" width={150} height={50} style={{ marginTop: '8px' }} />
                                     </Link>
                                 </div>
                             </div>

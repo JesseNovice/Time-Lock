@@ -40,7 +40,7 @@ const faq_data: DataType[] = [
 ]
 const FaqArea = () => {
   return (
-    <section className="faq pb-75" id='FAQs'>
+    <section className="faq pb-20 pt-20 mb-20" id='FAQs'>
       <div className="container">
         <div className="sec-title style2 text-center mb-40">
           <h2 className="sec-title__title text-50 mb-25">Frequently Asked Questions</h2>

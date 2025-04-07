@@ -58,7 +58,7 @@ const menu_data: MenuItem[] = [
         link: "/#FAQs",
     },
             {
-        id: 5,
+        id: 6,
         page: "home_1",
         has_dropdown: false,
         title: "Dapp",

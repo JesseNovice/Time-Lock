@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import MobileMenus from "./MobileMenu";
 
-import logo from "@/assets/img/logo/c24f83f8-814e-4d43-912e-4adc6154a01b.png"
+import logo from "/public/New_Logo.png"
 import HeaderSidebar from "./HeaderSidebar";
 
 
@@ -17,7 +17,7 @@ const Sidebar = ({ isActive, setIsActive, Sidebar, style_1, style_2 }: any) => {
                 </div>
                 <nav className="side-mobile-menu">
                     <Link className="header__logo mb-30" href="#!">
-                        <Image src={logo} alt="" />
+                        <Image src={logo} alt="Logo" width={150} height={50} />
                     </Link>
                     <div className="header-mobile-search">
                         <form role="search" method="get" onSubmit={(e) => e.preventDefault()}>

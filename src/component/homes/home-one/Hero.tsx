@@ -26,7 +26,7 @@ const Hero = () => {
   };
 
    return (
-      <section className="hero hero__blockchain pos-rel bg_img" style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)` }}>
+      <section className="hero hero__blockchain pos-rel bg_img pb-20 pt-20 mb-20" style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)` }}>
          <div className="container">
             <div className="row align-items-center">
                <div className="col-lg-7">
@@ -40,7 +40,7 @@ const Hero = () => {
                      </div>
                   </div>
                </div>
-               <div className="col-lg-5">
+               {/* <div className="col-lg-5">
                   <div className="hero__blockchain-icon pos-rel">
                      <div className="icon ul_li icon--1 absolute">
                         <span className="text-white mr-5">Secure & Safe</span>
@@ -59,7 +59,7 @@ const Hero = () => {
                         <span className="text-white ml-5">Community Focused</span>
                      </div>
                   </div>
-               </div>
+               </div> */}
             </div>
          </div>
       </section>

@@ -33,7 +33,7 @@ const roadmap_data: DataType[] = [
 
 const Roadmap = () => {
    return (
-      <section id="roadmap" className="roadmap pb-135 pt-120">
+      <section id="roadmap" className="roadmap pb-20 pt-20 mb-20">
          <div className="container">
             <div className="sec-title style2 text-center mb-60">
                <h2 className="sec-title__title text-50 mb-25">Roadmap</h2>
