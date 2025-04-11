@@ -21,7 +21,7 @@ const Hero = () => {
 
  const handleClick = () => {
     if (analytics) {
-      logEvent(analytics, "goal_completion", { name: "lever_puzzle" });
+      logEvent(analytics, "launch_app", { name: "launch_app" });
     }
   };
 
