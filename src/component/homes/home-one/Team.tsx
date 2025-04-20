@@ -22,9 +22,9 @@ const Team = () => {
                            <h3>{item.title}</h3>
                            <span>{item.designation}</span>
                         </div>
-                        <div className="rating">
+                        {/* <div className="rating">
                            <Image src={rating} alt="" />5.0
-                        </div>
+                        </div> */}
                      </div>
                   </div>
                ))}

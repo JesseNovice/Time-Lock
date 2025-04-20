@@ -39,7 +39,7 @@ const user_option_data: DataType[] = [
    },
    {
       id: 3,
-      title: "Vesting / Linear Distribution",
+      title: "Vesting Distribution",
       icon: icon_1, 
       list: [
          { title: "Gradual Release", desc: "Funds are distributed over time instead of all at once." },
@@ -62,12 +62,15 @@ const UserOption = () => {
 
 <div className="row align-items-center justify-content-center gx-4 gy-4">
    {user_option_data.map((item) => (
-<div key={item.id} className="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center text-center" style={{ maxWidth: "350px" }}>
+<div key={item.id} className="col-lg-4 col-md-6 col-sm-12 d-flex justify-content-center text-left" style={{ maxWidth: "350px" }}>
    <div className="border rounded p-5 shadow-lg bg-dark">
+      <div>
+      <h3 className="heading">{item.title}</h3>
+      <br/>
+      </div>
       <div className="icon pos-rel mb-3">
          <Image src={item.icon} alt={item.title} />
       </div>
-      <h3 className="heading">{item.title}</h3>
       <ul className="user-option__list list-unstyled mt-3">
          {item.list.map((list, i) => (
             <li key={i} className="mb-2">

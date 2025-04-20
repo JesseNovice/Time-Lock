@@ -4,29 +4,43 @@ import icon_1 from "@/assets/img/icon/rm_icon.png";
 
 interface DataType {
    id: number;
-   title: JSX.Element;
+   titleStage: string;
+   titlePeriod: string;
    list: string[];
 }[];
+
+const gradientStyle = {
+  background: 'linear-gradient(90deg, #2581e7 0%, #43e3d4 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  color: 'transparent',
+  display: 'inline-block',
+};
 
 const roadmap_data: DataType[] = [
    {
       id: 1,
-      title: (<>Stage 1 <br /> Q1 & Q2 - 2025</>),
-      list: ["Create beta version of dapp", "Begin testing", "Refine dapp", "Security Audit"],
+      titleStage: 'Stage 1',
+      titlePeriod: 'Q1 & Q2 - 2025',
+      list: ["Create beta version of dapp", "Begin testing", "Refine dapp with community feedback"],
    },
    {
       id: 2,
-      title: (<>Stage 2 <br /> Q2 & Q3 - 2025</>),
-      list: ["Mainnet Launch", "Smart Contract Upgrade", "Marketing Begins", "Community Weekly Feedback Sessions", "Roadmap Review"],
+      titleStage: 'Stage 2',
+      titlePeriod: 'Q2 & Q3 - 2025',
+      list: ["Mainnet Launch", "Marketing Begins", "Community Weekly Feedback Sessions", "Roadmap Review & Update"],
    },
    {
       id: 3,
-      title: (<>Stage 3 <br /> Q3 & Q4 - 2025</>),
-      list: ["Team Expasions", " Potential Network- Sol / BSC"],
+      titleStage: 'Stage 3',
+      titlePeriod: 'Q3 & Q4 - 2025',
+      list: ["Team Expasions", " Potential Network Expansions Sol / BSC", "Staking Options To Be Explored"],
    },
    {
       id: 4,
-      title: (<>Stage 4 <br /> Q4 - 2025 & Q1 = 2026</>),
+      titleStage: 'Stage 4',
+      titlePeriod: 'Q4 - 2025 & Q1 = 2026',
       list: [ "To Be Confirmed from Our Community Feedback & Roadmap Reviews"],
    },
 ]
@@ -46,7 +60,11 @@ const Roadmap = () => {
                         <div className="icon">
                            <Image src={icon_1} alt="" />
                         </div>
-                        <h3>{item.title}</h3>
+                        <h3>
+                          <span style={gradientStyle}>{item.titleStage}</span>
+                          <br />
+                       {/* <span>{item.titlePeriod}</span> */}
+                        </h3>
                         <ul className="list-unstyled">
                            {item.list.map((list, i) => (
                               <li key={i}>{list}</li>

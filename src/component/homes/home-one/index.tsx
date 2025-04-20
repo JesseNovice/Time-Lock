@@ -5,7 +5,7 @@ import FaqArea from "./FaqArea"
 import Hero from "./Hero"
 import Roadmap from "./Roadmap"
 import Team from "./Team"
-import UserOption from "./UserOption"
+import UserOption from "./VaultOptions"
 import Header from "@/layouts/headers/Header"
 
 

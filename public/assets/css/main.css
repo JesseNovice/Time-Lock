@@ -7296,3 +7296,42 @@ blockquote {
     padding: 10px;
   }
 }
+
+/* Responsive fixes for roadmap timeline and boxes */
+@media (max-width: 991px) {
+  .roadmap__list {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 10px;
+    position: relative;
+    min-height: 600px;
+    /* Adjust as needed */
+  }
+
+  .roadmap__list::before {
+    display: block !important;
+    position: absolute !important;
+    left: 20px !important;
+    top: 0 !important;
+    width: 2px !important;
+    height: 100% !important;
+    background: #2581e7 !important;
+    background-image: none !important;
+    content: "" !important;
+    z-index: 0 !important;
+  }
+
+  .roadmap__list-box {
+    width: 100% !important;
+    margin-bottom: 30px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .roadmap__list-inner {
+    max-width: 100% !important;
+    min-height: unset !important;
+    background: #0b0e13 !important;
+    padding: 24px 20px !important;
+  }
+} 
