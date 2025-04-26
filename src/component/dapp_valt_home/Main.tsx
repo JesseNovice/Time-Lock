@@ -468,6 +468,16 @@ const Main = () => {
     const { address, isConnected } = useAppKitAccount(); // Hook to access account data and connection status
     const { walletProvider } = useAppKitProvider<Eip1193Provider>("eip155");
     const [analytics, setAnalytics] = useState<Analytics | null>(null);
+    const { open } = useAppKit();
+
+
+    const handleButtonClick = useCallback(() => {
+  console.log("Wallet connecting...", address);
+  if (!isConnected) {
+    open();
+  }
+}, [isConnected, address, open]);
+
 
   // Fetch analytics safely
   useEffect(() => {
@@ -648,7 +658,7 @@ const addToWhiteList = async () => {
     return (
         <section
             className="hero hero__blockchain pos-rel bg_img"
-            style={{ backgroundImage: `url(assets/img/bg/blockchain_hero_bg.png)` }}>
+            style={{ backgroundImage: `url(/assets/img/bg/blockchain_hero_bg.png)` }}>
             <div className="container">
                 <div className="row align-items-center">
                     <div className="col-lg-7">
@@ -664,26 +674,21 @@ const addToWhiteList = async () => {
                             ) : hasPaidWhiteLabel === false ? (
                                 <NotPaidWhiteLabelSection addToWhiteList={addToWhiteList} />
                             ) : (
-                <Link className="blc-btn blc-btn--white" href="#" onClick={(e) => {
-    e.preventDefault(); // Ensures no unwanted navigation
-    console.log("🔄 Clicking Login button...");
-
-    try {
-        if (isConnected) {
-            console.log("✅ Wallet already connected:", address);
-        } else {
-            console.log("🔄 Opening WalletConnect modal...");
-            open(); // Opens WalletConnect
-        }
-    } catch (error) {
-        console.error("❌ Error opening WalletConnect:", error);
-    }
-}}>
-    {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : "Login"}
-                </Link>
-
-
-                            )}
+  <>
+    {console.log("Rendering LOGIN button")}
+    <div >
+      <button
+        className="blc-btn"
+        onClick={handleButtonClick}
+      >
+        <span>
+          <i className="fas fa-user"></i>
+          LOGIN
+        </span>
+      </button>
+    </div>
+  </>
+)}
                         </div>
                     </div>
                 </div>
