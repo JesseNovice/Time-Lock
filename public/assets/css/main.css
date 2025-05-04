@@ -7335,3 +7335,32 @@ blockquote {
     padding: 24px 20px !important;
   }
 } 
+
+.vault-card-box {
+  position: relative;
+  background-color: #111;
+  padding: 2px;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  border: 1px solid #222;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.04);
+  border-radius: 8px;
+  transition: 0.3s ease all;
+}
+
+.vault-card-inner {
+  background-color: #181818;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 1.5rem;
+}
+
+.vault-card-box:hover {
+  box-shadow: 0 0 18px rgba(0, 255, 255, 0.2);
+}
+
+.vault-card-title {
+  font-size: 1.25rem;
+  color: #00e0ff;
+  text-transform: uppercase;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}

@@ -4,7 +4,7 @@ import Advantages from "./Advantages"
 import FaqArea from "./FaqArea"
 import Hero from "./Hero"
 import Roadmap from "./Roadmap"
-import Team from "./Team"
+import Security from "./Security"
 import UserOption from "./VaultOptions"
 import Header from "@/layouts/headers/Header"
 
@@ -17,7 +17,7 @@ const HomeOne = () => {
         <Hero />
         <About />
         <UserOption />
-        <Team />
+        <Security />
         <Roadmap />
         <FaqArea />
         <FooterOne />

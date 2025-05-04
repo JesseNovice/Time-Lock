@@ -5,3 +5,31 @@
 @import "../../public/assets/css/fontawesome.css";
 @import "../../public/assets/css/metisMenu.css";
 @import "../../public/assets/scss/main.scss";
+
+.vault-card-box {
+    position: relative;
+    background-color: #111;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    border: 1px solid #222;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.08);
+    transition: box-shadow 0.3s ease;
+}
+
+.vault-card-inner {
+    background-color: #181818;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    padding: 1.5rem;
+}
+
+.vault-card-box:hover {
+    box-shadow: 0 0 18px rgba(0, 255, 255, 0.2);
+}
+
+.vault-card-title {
+    font-size: 1.25rem;
+    color: #00e0ff;
+    text-transform: uppercase;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+}
