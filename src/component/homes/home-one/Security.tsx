@@ -26,7 +26,7 @@ const Security = () => {
       <div className="container text-center">
         <h2 className="display-5 fw-bold mb-3">Our Security Protocols</h2>
         <p className="text-light mb-5">
-          We've created a system that is secure and transparent
+          We&apos;ve created a system that is secure and transparent
         </p>
 
         <div className="row gy-4">
