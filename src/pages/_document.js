@@ -15,6 +15,16 @@ export default function Document() {
           crossOrigin="anonymous"
         />
         {/* Add any other custom fonts you're using in your application */}
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-11499755334"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-11499755334');
+</script>
+
+
       </Head>
       <body>
         <Main />
