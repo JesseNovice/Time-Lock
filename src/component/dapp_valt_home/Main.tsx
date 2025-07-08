@@ -278,6 +278,27 @@ const HasPaidWhiteLabelSection = ({ vaults, getEthBalance, analytics }: { vaults
                     <p><strong>Balance:</strong> {balance !== null ? `${balance} ETH` : "Loading..."}</p> 
                     <p><strong>Vault Type:</strong> {selectedVault.vaultTypeName || "Unknown"}</p>
 
+
+                    <h3 style={{ fontSize: "20px", marginBottom: "15px" }}>Your Assets</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ETH</td>
+                                <td>{balance !== null ? `${balance} ETH` : "Loading..."}</td>
+                            </tr>
+                            <tr>
+                                <td>Token</td>
+                                <td>{balance !== null ? `${balance} ETH` : "Loading..."}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
                     {/* Input Section */}
                     <div style={{ marginTop: "20px", padding: "15px", background: "#111", borderRadius: "8px" }}>
                         <h4 style={{ marginBottom: "10px" }}>Deposit / Withdraw</h4>
