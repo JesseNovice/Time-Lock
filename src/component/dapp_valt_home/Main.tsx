@@ -11,7 +11,7 @@ import "@/assets/css/main.css"; // Import your global styles
 import { logEvent, Analytics } from "firebase/analytics";
 import { getAnalyticsInstance } from "@/lib/firebase"; // Import the new getter function
 import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react"; // Import the correct hooks and types
-
+import GoogleAdsConversion from "../../components/GoogleAdsConversion";
 
 const contractABI = whiteListABI.abi;
 const contractAddress = whiteListAddress;
@@ -473,12 +473,14 @@ const HasPaidWhiteLabelSection = ({ vaults, getEthBalance, analytics }: { vaults
 };
 
 const NotPaidWhiteLabelSection = ({ addToWhiteList }: { addToWhiteList: () => void }) => (
+    <>
+    <GoogleAdsConversion />
 
 
     <button className="btn btn-primary" onClick={addToWhiteList}>
         Pay One Time Fee Of 0.0014 ETH
     </button>
-    
+    </>
 );
 
 const Main = () => {
@@ -708,6 +710,7 @@ const addToWhiteList = async () => {
         </span>
       </button>
     </div>
+    <GoogleAdsConversion />
   </>
 )}
                         </div>
